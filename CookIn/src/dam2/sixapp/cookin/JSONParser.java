@@ -104,12 +104,19 @@ public class JSONParser {
                 // request method is POST
                 // defaultHttpClient
                 DefaultHttpClient httpClient = new DefaultHttpClient();
+                Log.d("httpClient",httpClient.toString());
                 HttpPost httpPost = new HttpPost(url);
+                Log.d("httppost",httpPost.toString());
+                Log.d("url",url);
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
+                Log.d("httppost2",httpPost.toString());
  
                 HttpResponse httpResponse = httpClient.execute(httpPost);
+                Log.d("httpResponse",httpResponse.toString());
                 HttpEntity httpEntity = httpResponse.getEntity();
+                Log.d("httpEntity",httpEntity.toString());
                 is = httpEntity.getContent();
+                Log.d("is",is.toString());
  
             }else if(method == "GET"){
                 // request method is GET
