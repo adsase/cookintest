@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -48,6 +52,9 @@ import com.google.android.gms.plus.model.people.Person;
 public class MainActivitySplash extends Activity implements OnClickListener,
 		ConnectionCallbacks, OnConnectionFailedListener {
 
+	/** 
+	 * Declaracion de todos los datos 
+	 * **/
 	private static final int RC_SIGN_IN = 0;
 	// Logcat tag
 	private static final String TAG = "MainActivity";
@@ -78,17 +85,9 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		setContentView(R.layout.activity_main_activity_splash);
 
+		/** ActionBar transparente **/
 		getActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#00000000")));
-		// getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_bg));
-		/*
-		 * View decorView = getWindow().getDecorView(); // Hide the status bar.
-		 * int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-		 * decorView.setSystemUiVisibility(uiOptions); // Remember that you
-		 * should never show the action bar if the // status bar is hidden, so
-		 * hide that too if necessary. ActionBar actionBar = getActionBar();
-		 * actionBar.hide();
-		 */
 
 		btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
 		btnSignOut = (Button) findViewById(R.id.btn_sign_out);
@@ -112,6 +111,10 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 				.addScope(Plus.SCOPE_PLUS_LOGIN).build();
 	}
 
+	/** 
+	 * Metodo para modificar una imagen, hacerla redonda y ponerle un 
+	 * borde ¡NO TOCAR! 
+	 * **/
 	public static Bitmap getCircularBitmapWithWhiteBorder(Bitmap bitmap,
 			int borderWidth) {
 		if (bitmap == null || bitmap.isRecycled()) {
@@ -155,7 +158,7 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Method to resolve any signin errors
+	 * Metodo para reparar cualquier error de logueo
 	 * */
 	private void resolveSignInError() {
 		if (mConnectionResult.hasResolution()) {
@@ -220,8 +223,8 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 
 	}
 
-	/**
-	 * Updating the UI, showing/hiding buttons and profile layout
+	/** 
+	 * Actualiza la interfaz, haciendo visible e invisible el layout y los botones
 	 * */
 	private void updateUI(boolean isSignedIn) {
 		if (isSignedIn) {
@@ -235,7 +238,8 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 		}
 	}
 
-	/**
+	/** 
+	 * Saca todos los datos del usuario
 	 * Fetching user's information name, email, profile pic
 	 * */
 	private void getProfileInformation() {
@@ -243,19 +247,26 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 			if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
 				Person currentPerson = Plus.PeopleApi
 						.getCurrentPerson(mGoogleApiClient);
+				/**
+				 * Guarda los datos de la cuenta en un intent
+				 **/
 				Intent intent = new Intent(getApplicationContext(), NewProductActivity.class);
 				intent.putExtra("id", currentPerson.getId().toString());
 				intent.putExtra("nombre", currentPerson.getDisplayName());
 				intent.putExtra("email", Plus.AccountApi.getAccountName(mGoogleApiClient));
-				Toast.makeText(getApplicationContext(),
-						currentPerson.getId().toString(), Toast.LENGTH_LONG)
-						.show();
+				//Toast.makeText(getApplicationContext(),
+				//		currentPerson.getId().toString(), Toast.LENGTH_LONG)
+				//		.show();
 				startActivity(intent);
-				//startActivityForResult(intent, 0);
-				//personNameView.setText(currentPerson.getDisplayName());
-				//personNameView.setText(currentPerson.getId()); 
-				//personEmailView.setText(Plus.AccountApi
-				//		.getAccountName(mGoogleApiClient));
+				
+				//ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+				//nameValuePairs.add(new BasicNameValuePair("id", currentPerson.getId().toString()));
+				//nameValuePairs.add(new BasicNameValuePair("nombre", currentPerson.getDisplayName()));
+				//nameValuePairs.add(new BasicNameValuePair("mail", Plus.AccountApi.getAccountName(mGoogleApiClient)));
+				
+				/**
+				 * Crea imagen avatar circular (descomentar para usar)
+				 **/
 				if (currentPerson.hasImage()) {
 
 					Person.Image image = currentPerson.getImage();
@@ -287,6 +298,9 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 					}.execute(image.getUrl());
 				}
 
+				/**
+				 * Crea imagen fondo (descomentar para usar)
+				 **/
 				if (currentPerson.hasCover()) {
 
 					Person.Cover.CoverPhoto cover = currentPerson.getCover()
@@ -330,7 +344,7 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Button on click listener
+	 * Botones
 	 * */
 	@Override
 	public void onClick(View v) {
@@ -362,7 +376,7 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Sign-in into google
+	 * Loguea en google
 	 * */
 	private void signInWithGplus() {
 		if (!mGoogleApiClient.isConnecting() && isNetworkAvailable() == true) {
@@ -375,7 +389,7 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Sign-out from google
+	 * Desloguea en google
 	 * */
 	private void signOutFromGplus() {
 		if (mGoogleApiClient.isConnected()) {
@@ -387,7 +401,7 @@ public class MainActivitySplash extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Revoking access from google
+	 * Revoca el acceso de la cuenta a google
 	 * */
 	private void revokeGplusAccess() {
 		if (mGoogleApiClient.isConnected()) {
